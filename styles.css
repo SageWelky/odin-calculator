@@ -1,8 +1,14 @@
+@font-face {
+  font-family: 'Digital-7 Mono';
+  src: url('./digitalMono.ttf') format('tff')
+}
+
 html, body {
   width: 100%;
   height: 100%;
   display: flex;
   justify-content: center;
+  background-color: burlywood;
 }
 
 #app-container {
@@ -10,7 +16,7 @@ html, body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 850px;
+  height: 900px;
   width: 595px;
   text-align: center;
   gap: 3px;
@@ -18,7 +24,7 @@ html, body {
   background: silver;
   margin: 20px;
   border-radius: 9px;
-  box-shadow: 0 0 7px black;
+  box-shadow: 0 0 9px black;
 }
 
 #app-container > div {
@@ -33,28 +39,50 @@ html, body {
   width: 100%;
   border: 15px solid silver;
   margin-bottom: 7px;
+  position: relative;
 }
 
 
-#calculator-viewport {
+
+#calculator-viewport, #input-numbers {
+  box-sizing: border-box;
   display: flex;
   flex-shrink: 0;
   align-items: center;
-  justify-content: center;
-  width: 111%;
+  justify-content: flex-end;
+  width: 90%;
   height: 57px;
   font-size: 33px;
-  font-family: 'Orbitron', sans-serif;
-  font-weight: 500;
-  color: darkslategrey;
-  transform:scale(.9,2.0);
+  font-family: 'Digital-7 Mono';
+  transform:scale(1.1,2.0);
+  border-radius: 2px;
+  color: rgba(42, 79, 70, 0.3);
   background-clip: padding-box;
   background-color: whitesmoke;
-  box-shadow: inset 0 0 20px black, inset 0 0 20px black;
+  text-align: right;
+  font-kerning: none;
+  position: absolute;
+  bottom: 5px;
+  padding-top: 3px;
+  padding-right: 17px;
+}
+
+#calculator-viewport {
   border: 4px solid grey;
   border-top: 2px solid grey;
   border-bottom: 2px solid grey;
-  border-radius: 2px;
+  box-shadow: inset 0 0 20px black, inset 0 0 20px black;
+  font-weight: 900;
+}
+
+#calculator-viewport-spacing-container > #input-numbers {
+  color: rgb(47, 79, 70);
+
+  background: transparent;
+  margin-right: 0px;
+  margin-top: 2px;
+  font-weight: 900;
+  padding-right: 21px;
 }
 
 #calculator-button-container {
@@ -72,15 +100,16 @@ html, body {
 
 .calculator-button {
   box-sizing: border-box;
-  border: 1px solid darkgray;
+  border: 2px solid rgb(102, 102, 102);
   width: 21%;
   height: 18%;
   padding: 10px;
-  border-radius: 2px;
-  box-shadow: 0 0 5px black;
-  background-color: whitesmoke;
+  border-radius: 5px;
+  box-shadow: 0 0 7px rgba(79, 79, 79, 0.79);
+  background-color: rgb(241, 241, 241);
   font-size: xx-large;
   font-family: Arial, Helvetica, sans-serif;
+  text-shadow: 1px 1px 3px rgba(79, 79, 79, 0.79);
   color:rgba(0, 0, 0, 0.85);
   font-weight: 800;
 }
