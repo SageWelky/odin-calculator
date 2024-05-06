@@ -1,7 +1,8 @@
 let active = [];
 let calculationItems = [];
 let currentOperandDecimalFlag = false;
-let currentDisplayOutput = "";
+let operandCurrentlyInDisplay = "";
+let activeLightBool = false;
 
 
 
@@ -121,9 +122,11 @@ function decimalInput() {
 function operatorInput( operator ) {
   console.log( typeof operator );
   if ( Number.isInteger( parseInt( active[active.length - 1] ) ) ) {
+
     calculationItems.push( parseFloat( active.reduce( (prev, curr) => {
       return prev.concat(curr);
     }, "")));
+
     console.log(calculationItems);
     active = [operator];
     console.log(active);
@@ -155,9 +158,26 @@ function clearInput( clearType ) {
     calculationItems = [];
     active = [];
     currentOperandDecimalFlag = false;
+    if ( activeLightBool ) {
+      let activeLight = document.querySelector(".active-light");
+      activeLight.classList.remove("active-light");
+    }
   } else if ( clearType === "CE" ) {
+
+    if ( active[0] === "+" || active[0] === "-"
+    || active[0] === "*" || active[0] === "/" ) {
+
+      if ( activeLightBool ) {
+        let activeLight = document.querySelector(".active-light");
+        activeLight.classList.remove("active-light");
+      }
+
+    }
+
     active = [];
   }
+
+  displayCurrentOperand( [""] )
   calculatorStateUpdate();
 
 }
@@ -197,9 +217,14 @@ function calculatorStateUpdate() {
 
     }
 
+    let activeLight = document.querySelector(".active-light");
+    activeLight.classList.remove("active-light");
+    displayCurrentOperand();
+    activeLightBool = false;
     displayCurrentOperand( [...calculationItems[0].toString().split("")] );
 
   } else {
+
     displayCurrentOperand();
   }
 }
@@ -209,10 +234,34 @@ function displayCurrentOperand( latestInput = [...active] ) {
   console.log( latestInput );
   if ( active[0] === "+" || active[0] === "-"
   || active[0] === "*" || active[0] === "/" ) {
-    //activate light
+    console.log("Light display should update in a moment")
+    let activeOperatorLight;
+
+    switch(latestInput.toString()) {
+      case "+":
+        console.log("Addition detected for light");
+        activeOperatorLight = document.querySelector("#addition-light");
+        activeOperatorLight.classList.add("active-light");
+        break;
+      case "-":
+        activeOperatorLight = document.querySelector("#subtraction-light");
+        activeOperatorLight.classList.add("active-light");
+        break;
+      case "*":
+        activeOperatorLight = document.querySelector("#multiplication-light");
+        activeOperatorLight.classList.add("active-light");
+        break;
+      case "/":
+        activeOperatorLight = document.querySelector("#division-light");
+        activeOperatorLight.classList.add("active-light");
+        break;
+    }
+
+    activeLightBool = true;
+
   } else {
     let decimalTrim = false;
-    currentDisplayOutput = latestInput.reduce( (prev, curr) => {
+    operandCurrentlyInDisplay = latestInput.reduce( (prev, curr) => {
       if (curr === ".") {
         decimalTrim = true;
         return prev.concat( curr );
@@ -224,5 +273,7 @@ function displayCurrentOperand( latestInput = [...active] ) {
       }
     }, "");
   }
-  console.log( "Display looks like:" + currentDisplayOutput );
+
+  //update DOM
+  console.log( "Display looks like:" + operandCurrentlyInDisplay );
 }
