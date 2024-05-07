@@ -5,7 +5,7 @@ let operandCurrentlyInDisplay = "";
 let activeLightBool = false;
 
 
-
+let inputNumbers = document.querySelector("#input-numbers");
 let calculatorButtonContainer = document.querySelector("#calculator-button-container");
 
 calculatorButtonContainer.addEventListener( "click", (event) => {
@@ -70,10 +70,9 @@ function selectionParser( buttonInput ) {
 
 function numberInput( numberInput ) {
 
-  console.log( typeof numberInput );
   if ( Number.isInteger( parseInt( active[active.length - 1] ) )
     || [active.length - 1] === ".") {
-    console.log("num detected");
+
     active.push( numberInput.toString() );
 
   } else if ( active.length === 0
@@ -90,12 +89,11 @@ function numberInput( numberInput ) {
     currentOperandDecimalFlag = false;
 
   } else  {
-    //if ( active.length === 0
-    //&& )
+
     active.push( numberInput.toString() );
 
   }
-  console.log(active);
+
   calculatorStateUpdate();
 
 }
@@ -204,6 +202,9 @@ function calculateInput( buttonPressedBool = false ) {
 
 function calculatorStateUpdate() {
 
+  console.log( "calculation items:" );
+  console.log( calculationItems );
+
   if ( calculationItems.length === 3 ) {
 
     console.log( "bingo time" );
@@ -213,7 +214,7 @@ function calculatorStateUpdate() {
 
     if ( calculationItems[0] > (10 ** 16) ) {
 
-      alert("Number too big for display, but still held onto.");
+      console.log("Number too big for display, but still held onto.");
 
     }
 
@@ -221,6 +222,7 @@ function calculatorStateUpdate() {
     activeLight.classList.remove("active-light");
     displayCurrentOperand();
     activeLightBool = false;
+    console.log( [...calculationItems[0].toString().split("")] )
     displayCurrentOperand( [...calculationItems[0].toString().split("")] );
 
   } else {
@@ -232,10 +234,13 @@ function calculatorStateUpdate() {
 function displayCurrentOperand( latestInput = [...active] ) {
   console.log( "latest input: " );
   console.log( latestInput );
-  if ( active[0] === "+" || active[0] === "-"
-  || active[0] === "*" || active[0] === "/" ) {
+  let finalOutput;
+  if ( latestInput[0] === "+" || latestInput[0] === "-"
+  || latestInput[0] === "*" || latestInput[0] === "/" ) {
     console.log("Light display should update in a moment")
     let activeOperatorLight;
+
+    console.log( "Operand Flag Triggered" );
 
     switch(latestInput.toString()) {
       case "+":
@@ -258,8 +263,12 @@ function displayCurrentOperand( latestInput = [...active] ) {
     }
 
     activeLightBool = true;
+    finalOutput = operandCurrentlyInDisplay;
 
   } else {
+
+    console.log( "Trim Flag Triggered" );
+
     let decimalTrim = false;
     operandCurrentlyInDisplay = latestInput.reduce( (prev, curr) => {
       if (curr === ".") {
@@ -268,12 +277,28 @@ function displayCurrentOperand( latestInput = [...active] ) {
       } else if ( decimalTrim ) {
         decimalTrim = false;
         return prev.concat( curr );
+      } else if ( prev === "" ) {
+        return prev.concat( curr );
       } else {
         return prev.concat( " " + curr );
       }
     }, "");
+
   }
 
+  let tempMyArray = [...operandCurrentlyInDisplay].filter( a => a !== " ");
+
+    if ( tempMyArray.length > 16 ) {
+      console.log( tempMyArray );
+      console.log( "flag2" );
+      finalOutput = parseFloat(tempMyArray.join("")).toExponential(7);
+      console.log( finalOutput );
+    } else {
+      finalOutput = operandCurrentlyInDisplay;
+    }
+
   //update DOM
-  console.log( "Display looks like:" + operandCurrentlyInDisplay );
+
+  console.log( "Display looks like:" + finalOutput );
+  inputNumbers.textContent = finalOutput;
 }
