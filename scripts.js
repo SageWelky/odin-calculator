@@ -3,6 +3,7 @@ let calculationItems = [];
 let currentOperandDecimalFlag = false;
 let operandCurrentlyInDisplay = "";
 let activeLightBool = false;
+console.log( "light off" );
 
 
 let inputNumbers = document.querySelector("#input-numbers");
@@ -58,7 +59,7 @@ function selectionParser( buttonInput ) {
         console.log( "That tickles! (you touched the button container)");
         break;
       default:
-        alert( "There was an error!" );
+        console.log( "There was an error!" );
         console.log( buttonInput );
         break;
     }
@@ -78,7 +79,7 @@ function numberInput( numberInput ) {
   } else if ( active.length === 0
     && typeof calculationItems[calculationItems.length - 1] === "number" ) {
 
-    alert( "Expecting an operator" );
+    console.log( "Expecting an operator" );
 
   } else if ( active[0] === "+" || active[0] === "-"
     || active[0] === "*" || active[0] === "/" ) {
@@ -101,7 +102,6 @@ function numberInput( numberInput ) {
 
 function decimalInput() {
 
-  console.log("decimal input run")
   if ( !currentOperandDecimalFlag ) {
     if ( Number.isInteger( parseInt( active[active.length - 1] ) ) ) {
       active.push( "." )
@@ -111,23 +111,21 @@ function decimalInput() {
     console.log( "already has a decimal" );
   }
 
-  console.log(active);
   calculatorStateUpdate();
 
 }
 
 
 function operatorInput( operator ) {
-  console.log( typeof operator );
+
   if ( Number.isInteger( parseInt( active[active.length - 1] ) ) ) {
 
     calculationItems.push( parseFloat( active.reduce( (prev, curr) => {
       return prev.concat(curr);
     }, "")));
 
-    console.log(calculationItems);
+
     active = [operator];
-    console.log(active);
     currentOperandDecimalFlag = false;
 
   } else if ( active.length === 0
@@ -138,14 +136,19 @@ function operatorInput( operator ) {
   } else if ( active[0] === "+" || active[0] === "-"
   || active[0] === "*" || active[0] === "/" || active[0] === "." ) {
 
-    alert( "Expecting an operand" )
+    console.log( "Expecting an operand" );
+    // No reason to update state, so don't.
     return;
 
   } else {
     console.log( "operator input very broken" );
+    // Definitely don't want to update state
+    // when we are getting unexpected behavior.
     return;
   }
-  console.log(active);
+
+  // Once an input is prepared
+  // we want to update state accoridingly to see what the calculator should be doing, if anything.
   calculatorStateUpdate();
 
 }
@@ -153,47 +156,84 @@ function operatorInput( operator ) {
 
 function clearInput( clearType ) {
   if ( clearType === "AC" )  {
+
     calculationItems = [];
     active = [];
     currentOperandDecimalFlag = false;
+
     if ( activeLightBool ) {
+
       let activeLight = document.querySelector(".active-light");
       activeLight.classList.remove("active-light");
+
     }
+
+    displayCurrentOperand( [""] );
+    calculatorStateUpdate();
+
   } else if ( clearType === "CE" ) {
 
     if ( active[0] === "+" || active[0] === "-"
     || active[0] === "*" || active[0] === "/" ) {
 
       if ( activeLightBool ) {
+
+        console.log( "light registered" );
         let activeLight = document.querySelector(".active-light");
         activeLight.classList.remove("active-light");
+        activeLightBool = false;
+
       }
 
     }
 
+    if ( calculationItems[0] ) {
+
+      displayCurrentOperand( [calculationItems[0]] );
+
+    } else {
+
+      displayCurrentOperand( [""] );
+
+    }
     active = [];
+
   }
-
-  displayCurrentOperand( [""] )
-  calculatorStateUpdate();
-
 }
 
 
 function calculateInput( buttonPressedBool = false ) {
-  if (!buttonPressedBool ) {
+
+  // The calculation can be done manually or conditionally automatic.
+  // We seperate these two because triggering the update manually
+  // should prepare the inputs (if in a valid state for calculation)
+  // so that they are in the same format as what would cause an
+  // automatic trigger, because the requirements should identical.
+  // so we want a manual call to arrange the inputs
+  // because the user thinks calculation can be done,
+  // and an automatic call to actually request the calculation.
+
+  // This ensures that the only way calculation happens is if the calculator
+  // expects it, preventing unaccounted for situations.
+
+  if ( !buttonPressedBool ) {
+
     return operatorParser[calculationItems[1]](calculationItems[0], calculationItems[2]);
+
   } else if ( typeof parseInt( active[active.length - 1] ) === "number"
-    && !isNaN( parseInt( active[active.length - 1] ) ) ) {
+    && !isNaN( parseInt( active[active.length - 1] ) ) && calculationItems.length === 2 ) {
+
     console.log("type detection: " + typeof parseInt( active[active.length - 1] ) );
     console.log("value detection: " + parseInt( active[active.length - 1] ) );
+
     calculationItems.push( parseFloat( active.reduce( (prev, curr) => {
       return prev.concat(curr);
     }, "")));
     active = [];
     currentOperandDecimalFlag = false;
+
     calculatorStateUpdate();
+
   }
 
 }
@@ -205,46 +245,55 @@ function calculatorStateUpdate() {
   console.log( "calculation items:" );
   console.log( calculationItems );
 
+  // The main state to check for is whether calculation should happen.
   if ( calculationItems.length === 3 ) {
 
-    console.log( "bingo time" );
-    console.log( "array length: " + calculationItems.length );
+    // Post calculation the array should have a first operand and be length 1.
     calculationItems = [calculateInput()];
-    console.log( "result: " + calculationItems );
 
-    if ( calculationItems[0] > (10 ** 16) ) {
-
-      console.log("Number too big for display, but still held onto.");
-
-    }
-
+    // Calculation items can only reach the length for calculation
+    // to trigger if an operator is used. So we know to turn it off.
     let activeLight = document.querySelector(".active-light");
     activeLight.classList.remove("active-light");
-    displayCurrentOperand();
     activeLightBool = false;
-    console.log( [...calculationItems[0].toString().split("")] )
+    console.log( "light off" );
+
+    // An automatic trigger happens when:
+    // num -> operator -> num -> operator
+    // is entered. We should check with display
+    // to see if a new operator light should be on.
+    // if there's an operator in 'active',
+    // display will catch it.
+    displayCurrentOperand();
+
+
+    // After handling the operator light,
+    // we need to update the display to show the
+    // new result as the first operand for the user
     displayCurrentOperand( [...calculationItems[0].toString().split("")] );
 
   } else {
 
+    // Anything that triggers a check for state
+    // should also update the display
     displayCurrentOperand();
   }
 }
 
 function displayCurrentOperand( latestInput = [...active] ) {
+
   console.log( "latest input: " );
   console.log( latestInput );
+
   let finalOutput;
+
   if ( latestInput[0] === "+" || latestInput[0] === "-"
   || latestInput[0] === "*" || latestInput[0] === "/" ) {
-    console.log("Light display should update in a moment")
-    let activeOperatorLight;
 
-    console.log( "Operand Flag Triggered" );
+    let activeOperatorLight;
 
     switch(latestInput.toString()) {
       case "+":
-        console.log("Addition detected for light");
         activeOperatorLight = document.querySelector("#addition-light");
         activeOperatorLight.classList.add("active-light");
         break;
@@ -263,13 +312,13 @@ function displayCurrentOperand( latestInput = [...active] ) {
     }
 
     activeLightBool = true;
+    console.log( "light on" );
     finalOutput = operandCurrentlyInDisplay;
 
   } else {
 
-    console.log( "Trim Flag Triggered" );
-
     let decimalTrim = false;
+
     operandCurrentlyInDisplay = latestInput.reduce( (prev, curr) => {
       if (curr === ".") {
         decimalTrim = true;
@@ -289,16 +338,39 @@ function displayCurrentOperand( latestInput = [...active] ) {
   let tempMyArray = [...operandCurrentlyInDisplay].filter( a => a !== " ");
 
     if ( tempMyArray.length > 16 ) {
-      console.log( tempMyArray );
-      console.log( "flag2" );
+
       finalOutput = parseFloat(tempMyArray.join("")).toExponential(7);
-      console.log( finalOutput );
+      let decimalTrim = false;
+
+      finalOutput = finalOutput.toString().split("").reduce( (prev, curr) => {
+
+        if (curr === ".") {
+          decimalTrim = true;
+          return prev.concat( curr );
+        } else if ( decimalTrim ) {
+          decimalTrim = false;
+          return prev.concat( curr );
+        } else if ( prev === "" ) {
+          return prev.concat( curr );
+        } else {
+          return prev.concat( " " + curr );
+        }
+
+      }, "");
     } else {
+
       finalOutput = operandCurrentlyInDisplay;
+
+    }
+    if (latestInput[latestInput.length - 1] === ".") {
+      console.log( "decimal last detected");
+      console.log( finalOutput );
+      console.log( typeof finalOutput );
+      finalOutput = finalOutput.concat("0");
+      console.log( finalOutput );
     }
 
   //update DOM
-
   console.log( "Display looks like:" + finalOutput );
   inputNumbers.textContent = finalOutput;
 }
