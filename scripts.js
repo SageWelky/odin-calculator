@@ -80,6 +80,8 @@ function numberInput( numberInput ) {
     && typeof calculationItems[calculationItems.length - 1] === "number" ) {
 
     console.log( "Expecting an operator" );
+    // Do not update state if we're not accepting a new input.
+    return;
 
   } else if ( active[0] === "+" || active[0] === "-"
     || active[0] === "*" || active[0] === "/" ) {
@@ -189,7 +191,7 @@ function clearInput( clearType ) {
 
     if ( calculationItems[0] ) {
 
-      displayCurrentOperand( [calculationItems[0]] );
+      displayCurrentOperand( [...calculationItems[0].toString().split("")] );
 
     } else {
 
@@ -368,6 +370,12 @@ function displayCurrentOperand( latestInput = [...active] ) {
       console.log( typeof finalOutput );
       finalOutput = finalOutput.concat("0");
       console.log( finalOutput );
+    }
+    if (finalOutput === "I n f i n i t y") {
+      finalOutput = "0 F F. .0 F. .5 C A L E";
+    }
+    if (finalOutput === "N a N") {
+      finalOutput = "A C. .C A L C. .P L E A 5 E";
     }
 
   //update DOM

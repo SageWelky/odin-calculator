@@ -80,7 +80,7 @@ html, body {
 
 
 
-#calculator-viewport, #input-numbers {
+#calculator-viewport, #input-numbers, #extra-viewport-styling {
   box-sizing: border-box;
   display: flex;
   flex-shrink: 0;
@@ -103,18 +103,29 @@ html, body {
 }
 
 #calculator-viewport {
-  color: rgba(42, 79, 70, 0.2);
+  background-color: transparent;
+  color: rgb(213, 226, 223);
   border: 4px solid grey;
   border-top: 2px solid grey;
   border-bottom: 2px solid grey;
-  box-shadow: inset 0 0 20px black, inset 0 0 20px black;
+  box-shadow: inset 0 0 15px black, inset 0 0 10px black;
+  font-weight: 600;
+}
+
+#extra-viewport-styling {
+  background-color: rgb(250, 250, 250);
+  color: rgb(213, 226, 223);
   font-weight: 900;
+  margin-right: 0px;
+  margin-top: 2px;
+  font-weight: 600;
+  padding-right: 21px;
 }
 
 #calculator-viewport-spacing-container > #input-numbers {
   color: rgb(47, 79, 70);
-
-  background: transparent;
+  box-shadow: inset 0 0 10px black;
+  background: rgba(255, 255, 255, 0.2);
   margin-right: 0px;
   margin-top: 2px;
   font-weight: 900;
